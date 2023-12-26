@@ -3,8 +3,7 @@ import numpy as np
 # from itertools import permutations
 import random
 
-m = load_model(r'C:\Users\jatin\Music\tic-tac-toe.h5')
-# m = load_model(r'C:\Users\jatin\Downloads\my_model.h5')
+m = load_model(r'tic-tac-toe.h5')
 m.summary()
 scores = []
 
