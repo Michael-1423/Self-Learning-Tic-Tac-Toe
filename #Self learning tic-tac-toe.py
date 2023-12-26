@@ -17,6 +17,8 @@ win_counter=0
 loose_counter=0
 draw_counter=0
 
+n = 1000 # number of training iterations/games to be played.
+
 mat = np.zeros((3,3))
 mat = np.array([[0,0,1],[2,0,0],[0,0,0]])
 def legal_move(mat,x):
@@ -29,23 +31,22 @@ def legal_move(mat,x):
                 l.append(place(x,i,j,mat))
     return l
 # print(legal_move(mat,1))
-model = load_model(r'C:\Users\jatin\Music\tic-tac-toe.h5')
-updated_model = load_model(r'C:\Users\jatin\Music\tic-tac-toe.h5')
-model.summary()    
-model1 = load_model(r'C:\Users\jatin\Downloads\my_model.h5')
-# model = Sequential()
-# model.add(Dense(18, input_dim=9,kernel_initializer='normal', activation='relu'))
-# model.add(Dropout(0.1))
-# model.add(Dense(9, kernel_initializer='normal',activation='relu'))
-# model.add(Dropout(0.1))
-# model.add(Dense(1,kernel_initializer='normal'))
+# model = load_model(r'tic-tac-toe.h5')
+# model.summary()    
 
-# learning_rate = 0.001
-# momentum = 0.8
+model = Sequential()
+model.add(Dense(18, input_dim=9,kernel_initializer='normal', activation='relu'))
+model.add(Dropout(0.1))
+model.add(Dense(9, kernel_initializer='normal',activation='relu'))
+model.add(Dropout(0.1))
+model.add(Dense(1,kernel_initializer='normal'))
 
-# sgd = SGD(lr=learning_rate, momentum=momentum,nesterov=False)
-# model.compile(loss='mean_squared_error', optimizer=sgd)
-# model.summary()
+learning_rate = 0.001
+momentum = 0.8
+
+sgd = SGD(lr=learning_rate, momentum=momentum,nesterov=False)
+model.compile(loss='mean_squared_error', optimizer=sgd)
+model.summary()
 
 def move_selector(model,mat,x):
     t = []
@@ -322,22 +323,24 @@ def train(model,win_counter,loose_counter,draw_counter,mode):
     # update the weights of the model, one record at a time
     model.fit(x,y,epochs=1,batch_size=1,verbose=0)
     return model,y,status,win_counter,loose_counter,draw_counter,trend
-n = 2000
-for i in range(n):
+
+for i in range(1,n+1):
     choice = rm.randint(1,2)
     # choice=1
     if choice==1:
-        updated_model,y,result,win_counter,loose_counter,draw_counter,trend = train(model,win_counter,loose_counter,draw_counter,'easy')
+        model,y,result,win_counter,loose_counter,draw_counter,trend = train(model,win_counter,loose_counter,draw_counter,'easy')
     elif choice==2:
-        updated_model,y,result,win_counter,loose_counter,draw_counter,trend = train(updated_model,win_counter,loose_counter,draw_counter,'hard')
+        model,y,result,win_counter,loose_counter,draw_counter,trend = train(model,win_counter,loose_counter,draw_counter,'hard')
     if i%1000==0:
         rr = [j for j in range(i+1)]
-        print(rr)
-        print(trend)
+        # print(rr)
+        # print(trend)
         plt.plot(rr,trend)
+        plt.xlabel("Games") 
+        plt.ylabel("Trend")
         plt.show()
 
-updated_model.save(r'C:\Users\jatin\Music\tic-tac-toe.h5')
+model.save(r'tic-tac-toe.h5')
 et = time()
 
 print(f"Time take to run: {(et-st)/60} hours")
@@ -351,7 +354,7 @@ print("Draw frequency:" , draw_counter)
 print("Draw percentage:\n",(draw_counter/n)*100)
 
 rr = [i for i in range(n)]
-print("trend: ",trend)
-print(len(trend))
 plt.plot(rr,trend)
+plt.xlabel("Games") 
+plt.ylabel("Trend")
 plt.show()
